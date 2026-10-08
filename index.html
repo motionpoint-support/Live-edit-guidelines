@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Edit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=Lexend:wght@400;500;600;700&amp;family=Lato:wght@400;700;900&amp;display=swap">
+<style>
+body{margin:0;font-family:'Lato',system-ui,sans-serif;background:#0E1B2E;color:#0B2545}
+a{color:#1466F0}a:hover{color:#0B4FC0}
+.stage *{box-sizing:border-box}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace}
+.disp{font-family:'Lexend','Lato',sans-serif}
+.paused,.paused *{animation-play-state:paused !important}
+.sh{position:absolute;left:40px;top:-4px}
+.h2{font-family:'Lexend','Lato',sans-serif;font-size:30px;font-weight:700;color:#0B2545}
+.h2s{font-size:18px;color:#3B4F6B}
+.sc{position:absolute;top:66px;height:86px;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.sn{font-family:'Lexend','Lato',sans-serif;width:30px;height:30px;border-radius:15px;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.st{font-size:16px;font-weight:900;color:#0B2545;line-height:1.2}
+.tg{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:11px;color:#FFFFFF;font-size:11px;font-weight:900;letter-spacing:.03em;white-space:nowrap}
+.mk{position:absolute;right:-9px;bottom:-11px}
+.panel{position:absolute;left:40px;top:170px;width:1200px;height:460px;border-radius:22px;background:#FFFFFF;box-shadow:0 14px 36px rgba(11,37,69,.10);overflow:hidden}
+.win{position:absolute;left:0;top:0;width:1200px;height:460px;background:#FFFFFF}
+.ill{position:absolute;left:26px;top:26px;width:470px;height:408px;border-radius:18px;overflow:hidden}
+.tc{position:absolute;left:530px;top:30px;width:640px;display:flex;flex-direction:column;gap:12px}
+.eb{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.tt{font-family:'Lexend','Lato',sans-serif;font-size:28px;font-weight:700;color:#0B2545;line-height:1.2;margin-bottom:2px}
+.bl{display:flex;gap:12px;align-items:flex-start}
+.bn{width:26px;height:26px;border-radius:13px;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.bt{font-size:19px;line-height:1.4;color:#0B2545;font-weight:700}
+.lp{align-self:flex-start;margin-top:10px;height:46px;padding:0 20px 0 10px;border-radius:23px;display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:900}
+.ex{margin-top:6px;border-radius:14px;background:#FFF7F0;border:2px dashed #C2410C;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
+.exh{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#9A3412}
+.ext{font-size:17px;line-height:1.45;font-weight:700;color:#0B2545}
+.wc{position:absolute;background:#FFFFFF;border-radius:14px;box-shadow:0 10px 24px rgba(11,37,69,.14);overflow:hidden}
+.bar{height:30px;background:#E9EEF5;display:flex;align-items:center;gap:5px;padding:0 10px}
+.dot{width:8px;height:8px;border-radius:4px}
+.url{margin-left:6px;flex-grow:1;height:18px;border-radius:9px;background:#FFFFFF;font-size:11px;color:#3B4F6B;padding:0 8px;line-height:18px;white-space:nowrap;overflow:hidden}
+.ln{height:8px;border-radius:4px;background:#E3E9F2}
+.lab{font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#5A6B84}
+.fld{height:32px;border-radius:8px;border:2px solid #C9D3E1;display:flex;align-items:center;padding:0 10px;font-size:13px;color:#0B2545}
+.av{position:absolute}
+@keyframes panX{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(-1264px)}}
+.shot{position:absolute;left:26px;top:26px;width:700px;height:408px;border-radius:14px;background:#EEF2F8;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tc2{position:absolute;left:752px;top:30px;width:424px;display:flex;flex-direction:column;gap:12px}
+.call{margin-top:6px;border-radius:14px;background:#1466F0;color:#FFFFFF;padding:14px 18px;display:flex;flex-direction:column;gap:4px}
+.rz{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:16px;background:#FFF7F0;border:2px solid #C2410C;color:#7C2D12;font-size:14px;font-weight:900;white-space:nowrap}
+.ch{height:40px;padding:0 16px;border-radius:20px;background:#FFFFFF;display:inline-flex;align-items:center;font-size:15px;font-weight:900}
+.row{height:44px;border-radius:12px;background:#FFFFFF;display:flex;align-items:center;gap:10px;padding:0 14px;font-size:16px;font-weight:700;color:#0B2545;box-shadow:0 4px 10px rgba(11,37,69,.06)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes fromL{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+@keyframes fromR{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.6)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes win{0%{opacity:0;transform:translateY(14px)}9%{opacity:1;transform:none}90%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(20,102,240,.45),0 18px 40px rgba(11,37,69,.14)}50%{box-shadow:0 0 0 16px rgba(20,102,240,0),0 18px 40px rgba(11,37,69,.14)}}
+@keyframes warnPulse{0%,100%{box-shadow:0 0 0 0 rgba(234,88,12,.55)}50%{box-shadow:0 0 0 12px rgba(234,88,12,0)}}
+@keyframes press{0%,100%{transform:scale(1)}50%{transform:scale(.94)}}
+@keyframes typeIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.7) rotate(-7deg)}60%{opacity:1;transform:scale(.95) rotate(-7deg)}100%{opacity:1;transform:scale(1) rotate(-7deg)}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes march{to{stroke-dashoffset:-72}}
+@keyframes arc{from{stroke-dashoffset:302}to{stroke-dashoffset:0}}
+@keyframes pass{from{transform:translateX(0)}to{transform:translateX(196px)}}
+@keyframes toL{from{opacity:1;transform:none}to{opacity:0;transform:translate(-320px,250px) scale(.35)}}
+@keyframes toR{from{opacity:1;transform:none}to{opacity:0;transform:translate(320px,250px) scale(.35)}}
+@keyframes hiO{0%{background:#FFFFFF}100%{background:#FFF1E6;box-shadow:0 0 0 3px #C2410C}}
+@keyframes toGrey{to{background:#94A3B8}}
+@keyframes litRing{0%{box-shadow:0 0 0 0 currentColor;transform:none}8%,92%{box-shadow:0 0 0 4px currentColor,0 16px 30px rgba(11,37,69,.18);transform:translateY(-6px)}100%{box-shadow:0 0 0 0 transparent;transform:none}}
+.ctl{height:44px;min-width:44px;padding:0 14px;border-radius:10px;border:1px solid #2A3E5C;background:#15263F;color:#E6EEF8;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.ctl:hover{background:#1D3354}
+.ctl.main{background:#1466F0;border-color:#1466F0;color:#fff}
+.ctl.main:hover{background:#0B55D0}
+.chip{height:32px;padding:0 7px;letter-spacing:-.01em;border-radius:16px;border:1px solid #2A3E5C;background:transparent;color:#A9B8CC;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.chip:hover{color:#fff;border-color:#4A6488}
+.chip.done{color:#D5E0EE;border-color:#34507A;background:#16304F}
+.chip.on{color:#0B2545;background:#8FD16F;border-color:#8FD16F}
+</style>
+<style>
+html,body{height:100%}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+#fit{width:1280px;height:870px;transform-origin:center center;flex-shrink:0}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div id="fit">
+<div style="width: 1280px; height: 870px; background: #0E1B2E; display: flex; flex-direction: column; overflow: hidden;">
+
+<!-- hidden symbol library -->
+<svg width="0" height="0" style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+<defs>
+<symbol id="dc-customer" viewBox="0 0 200 200">
+<path d="M58 88 C52 38 148 38 142 88 L146 124 C132 132 124 116 122 104 L78 104 C76 116 68 132 54 124 Z" fill="#3B2A26"></path>
+<path d="M40 200 C40 150 66 128 100 128 C134 128 160 150 160 200 Z" fill="#23A094"></path>
+<path d="M84 129 L100 152 L116 129 Z" fill="#E6F6F3"></path>
+<rect x="89" y="104" width="22" height="28" rx="8" fill="#E2A77F"></rect>
+<ellipse cx="100" cy="82" rx="32" ry="36" fill="#F1C39E"></ellipse>
+<path d="M66 76 C68 42 132 40 136 78 C118 64 94 60 70 80 Z" fill="#3B2A26"></path>
+<circle cx="88" cy="87" r="3.8" fill="#1F2937"></circle>
+<circle cx="112" cy="87" r="3.8" fill="#1F2937"></circle>
+<circle cx="79" cy="98" r="5.5" fill="#F29A86" opacity=".45"></circle>
+<circle cx="121" cy="98" r="5.5" fill="#F29A86" opacity=".45"></circle>
+<path d="M90 102 Q100 109 110 102" stroke="#A0523D" stroke-width="3" fill="none" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-agent" viewBox="0 0 200 200">
+<path d="M40 200 C40 150 66 128 100 128 C134 128 160 150 160 200 Z" fill="#1466F0"></path>
+<path d="M84 129 L100 150 L116 129 Z" fill="#FFFFFF"></path>
+<rect x="89" y="104" width="22" height="28" rx="8" fill="#B97A55"></rect>
+<ellipse cx="68" cy="88" rx="7" ry="10" fill="#C98B63"></ellipse>
+<ellipse cx="132" cy="88" rx="7" ry="10" fill="#C98B63"></ellipse>
+<ellipse cx="100" cy="82" rx="32" ry="36" fill="#D39A72"></ellipse>
+<path d="M67 80 C62 42 138 40 133 80 C126 60 80 58 67 80 Z" fill="#1F1A17"></path>
+<circle cx="88" cy="87" r="3.8" fill="#1F2937"></circle>
+<circle cx="112" cy="87" r="3.8" fill="#1F2937"></circle>
+<path d="M89 101 Q100 109 111 101" stroke="#7A3B2A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-server" viewBox="0 0 120 150">
+<rect x="10" y="6" width="100" height="40" rx="8" fill="#243B5E"></rect>
+<rect x="10" y="54" width="100" height="40" rx="8" fill="#2E4A73"></rect>
+<rect x="10" y="102" width="100" height="40" rx="8" fill="#243B5E"></rect>
+<circle cx="28" cy="26" r="5" fill="#8FD16F"></circle><circle cx="28" cy="74" r="5" fill="#8FD16F"></circle><circle cx="28" cy="122" r="5" fill="#8FD16F"></circle>
+<rect x="46" y="22" width="50" height="8" rx="4" fill="#5B7BA6"></rect><rect x="46" y="70" width="50" height="8" rx="4" fill="#5B7BA6"></rect><rect x="46" y="118" width="50" height="8" rx="4" fill="#5B7BA6"></rect>
+</symbol>
+<symbol id="dc-check" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="11" fill="#3E9B2F"></circle>
+<path d="M6.5 12.5 L10.3 16.2 L17.5 8.6" stroke="#FFFFFF" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+</symbol>
+<symbol id="dc-x" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="11" fill="#C2410C"></circle>
+<path d="M8 8l8 8M16 8l-8 8" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-warn" viewBox="0 0 24 24">
+<path d="M12 3 L22 20.5 H2 Z" fill="#F2A93B" stroke="#8A5200" stroke-width="1.4" stroke-linejoin="round"></path>
+<path d="M12 9.5 V14.5" stroke="#5A3500" stroke-width="2.2" stroke-linecap="round"></path>
+<circle cx="12" cy="17.4" r="1.3" fill="#5A3500"></circle>
+</symbol>
+<symbol id="dc-ticket" viewBox="0 0 24 24">
+<path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8"></path>
+<path d="M9 5v14" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2 2.4"></path>
+</symbol>
+<symbol id="dc-clock" viewBox="0 0 24 24">
+<circle cx="12" cy="13" r="8.5" fill="none" stroke="currentColor" stroke-width="1.9"></circle>
+<path d="M12 8.5V13l3 2M10 2.5h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-phone" viewBox="0 0 24 24">
+<path d="M5 3.5h3.5l2 5-2.5 1.6a11 11 0 0 0 5.4 5.4l1.6-2.5 5 2v3.5a2 2 0 0 1-2 2A17 17 0 0 1 3 5.5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"></path>
+</symbol>
+<symbol id="dc-cal" viewBox="0 0 24 24">
+<rect x="3" y="5" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"></rect>
+<path d="M16 3v4M8 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-mail" viewBox="0 0 24 24">
+<rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"></rect>
+<path d="M3.5 7l8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"></path>
+</symbol>
+<symbol id="dc-lock" viewBox="0 0 24 24">
+<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"></rect>
+<path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.9"></path>
+<circle cx="12" cy="15.6" r="1.6" fill="currentColor"></circle>
+</symbol>
+<symbol id="dc-doc" viewBox="0 0 40 48">
+<path d="M4 4h22l10 10v30H4z" fill="#FFFFFF" stroke="#6D4AE0" stroke-width="2.4" stroke-linejoin="round"></path>
+<path d="M26 4v10h10" fill="none" stroke="#6D4AE0" stroke-width="2.4" stroke-linejoin="round"></path>
+<path d="M11 24h18M11 31h18M11 38h12" stroke="#B9A8F2" stroke-width="3" stroke-linecap="round"></path>
+</symbol>
+<symbol id="dc-img" viewBox="0 0 24 24">
+<rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"></rect>
+<circle cx="9" cy="9.5" r="1.8" fill="currentColor"></circle>
+<path d="M3.5 17l5-5 4 4 3-3 5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"></path>
+</symbol>
+<symbol id="dc-play" viewBox="0 0 24 24">
+<path d="M7 4.5v15l12-7.5z" fill="currentColor"></path>
+</symbol>
+<symbol id="dc-edit" viewBox="0 0 24 24">
+<path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"></path>
+<path d="M13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="1.9"></path>
+</symbol>
+</defs>
+</svg>
+
+<!-- ===================== STAGE ===================== -->
+<div id="stage" class="stage" style="position: relative; width: 1280px; height: 720px; overflow: hidden; background: #F3F6FB; flex-shrink: 0;">
+
+<div style="position: absolute; left: -160px; top: -200px; width: 560px; height: 560px; border-radius: 50%; background: #E6EEFA;"></div>
+<div style="position: absolute; right: -120px; bottom: -220px; width: 520px; height: 520px; border-radius: 50%; background: #EAF5E4;"></div>
+
+<div style="position: absolute; left: 28px; top: 14px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; color: #3B4F6B; letter-spacing: .02em;">
+<span id="steps" style="display: contents;"></span>
+<span class="disp" style="font-weight: 700; color: #0B2545; font-size: 16px;">MotionPoint Support</span>
+<span style="width: 4px; height: 4px; border-radius: 2px; background: #94A3B8;"></span>
+<span>New Agent Training &middot; Live Edit</span>
+</div>
+
+<!-- ============ SCENE 0 · INTRO ============ -->
+<template id="scene-0">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div style="position: absolute; left: 0; top: 24px; width: 1280px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;"><div style="font-size: 16px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: #3E8A2A; animation: up .8s .4s both;">Customer Support &middot; New Agent Training</div><h1 class="disp" style="margin: 0; font-size: 60px; line-height: 1.05; font-weight: 700; color: #0B2545; animation: up .9s .9s both;">Live Edit</h1><p style="margin: 0; font-size: 23px; color: #3B4F6B; max-width: 1000px; animation: up .9s 1.6s both;">The customer&rsquo;s tool to send feedback, or edit their translated site directly.</p></div>
+<div style="position: absolute; left: 40px; top: 220px; width: 380px; height: 180px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 5s both;"><span class="eb" style="color: #1466F0;">What</span><span style="font-size: 17px; font-weight: 700; color: #0B2545; line-height: 1.4;">A browser-based tool in ControlCenter to send feedback to MotionPoint or edit translations on the live translated site.</span></div>
+<div style="position: absolute; left: 450px; top: 220px; width: 380px; height: 180px; border-radius: 16px; background: #FCE3CC; border: 3px solid #C2410C; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 9s both;"><span class="eb" style="color: #C2410C;">Why you need it</span><span style="font-size: 17px; font-weight: 700; color: #0B2545; line-height: 1.4;">Customers use it every day. You need to know what it does to answer their questions.</span></div>
+<div style="position: absolute; left: 860px; top: 220px; width: 380px; height: 180px; border-radius: 16px; background: #E5F4DE; border: 3px solid #2F7A22; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 13s both;"><span class="eb" style="color: #2F7A22;">Who uses it</span><span style="font-size: 17px; font-weight: 700; color: #0B2545; line-height: 1.4;">Customer users with a Live Edit role: Reviewers send feedback; Editors send feedback and make edits.</span></div>
+<div style="position: absolute; left: 160px; top: 436px; width: 960px; height: 104px; border-radius: 20px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 18px; padding: 0 30px; animation: up .7s 19s both;"><svg width="40" height="40" style="flex-shrink: 0; color: #F6C453;"><use href="#dc-warn"></use></svg><span style="font-size: 21px; font-weight: 900; line-height: 1.4;">A saved edit goes live right away, and changes every identical segment.</span></div>
+</div>
+</template>
+
+<!-- ============ SCENE 1 · GETTING AROUND ============ -->
+<template id="scene-1">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 1: Getting around Live Edit</div><div class="h2s">Where it is, and what&rsquo;s on screen.</div></div>
+<div class="sc" style="left: 40px; width: 592px; background: #DCE7F7; color: #1466F0; animation: up .6s 1.4s both, litRing 18s 4s both;"><div class="sr"><span class="sn" style="background: #1466F0;">1</span><span class="tg" style="background: #1466F0;">ControlCenter</span></div><div class="st">Four areas</div><svg class="mk" width="28" height="28" style="animation: pop .5s 21.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 648px; width: 592px; background: #DCE7F7; color: #1466F0; animation: up .6s 1.6s both, litRing 18s 22s both;"><div class="sr"><span class="sn" style="background: #1466F0;">2</span><span class="tg" style="background: #1466F0;">Features</span></div><div class="st">The toolbar</div><svg class="mk" width="28" height="28" style="animation: pop .5s 39.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Let&rsquo;s open Live Edit.</div>
+<div class="win" style="animation: win 18s 4s both;">
+<div class="shot" style="background: #DCE7F7; display: block;"><div class="wc" style="left: 20px; top: 14px; width: 660px; height: 120px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 4.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 5s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF; box-shadow: 0 0 0 3px #F6C453;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B; box-shadow: 0 0 0 3px #F6C453;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B; box-shadow: 0 0 0 3px #F6C453;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B; box-shadow: 0 0 0 3px #F6C453;">Pages Review</span></div><span style="font-size: 12px; color: #3B4F6B;">control.motionpoint.com &rsaquo; Live Edit &middot; in a browser like Chrome or Firefox</span></div><div style="position: absolute; left: 20px; top: 150px; width: 156px; height: 230px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 6.5s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Navigate</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Go to any page of the translated site</span></div><div style="position: absolute; left: 188px; top: 150px; width: 156px; height: 230px; border-radius: 16px; background: #E5F4DE; border: 3px solid #2F7A22; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 7.8s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Edit</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Send feedback or edit content segments</span></div><div style="position: absolute; left: 356px; top: 150px; width: 156px; height: 230px; border-radius: 16px; background: #FCE3CC; border: 3px solid #C2410C; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 9.1s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Dashboard</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Reports on feedback and edits</span></div><div style="position: absolute; left: 524px; top: 150px; width: 156px; height: 230px; border-radius: 16px; background: #DDF3F1; border: 3px solid #0F7C7A; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 10.4s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Pages Review</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Set up pages to review</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #1466F0;">Around &middot; 1 of 2</div>
+<div class="tt" style="font-size: 26px;">Open it, and the four areas</div>
+<div class="bl" style="animation: fromR .6s 5.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">1</span><span class="bt" style="font-size: 18px;">Live Edit is in ControlCenter: control.motionpoint.com.</span></div>
+<div class="bl" style="animation: fromR .6s 7s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">2</span><span class="bt" style="font-size: 18px;">Four areas at the top: Navigate, Edit, Dashboard, Pages Review.</span></div>
+<div class="bl" style="animation: fromR .6s 12s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">3</span><span class="bt" style="font-size: 18px;">Customers who need a login ask their CXM.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 22s both;">
+<div class="shot" style="background: #DCE7F7; display: block;"><div class="wc" style="left: 20px; top: 14px; width: 660px; height: 370px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 22.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 22.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Pages Review</span></div><div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #F3F6FB; border-radius: 8px; animation: fadeIn .4s 23s both;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 30px; height: 16px; border-radius: 8px; background: #1466F0; position: relative;"><span style="position: absolute; right: 2px; top: 2px; width: 12px; height: 12px; border-radius: 6px; background: #FFFFFF;"></span></span><span style="font-size: 11px; color: #0B2545; font-weight: 700;">Additional content</span></span><span style="display: flex; align-items: center; gap: 6px;"><span class="mono" style="width: 210px; height: 26px; border: 1px solid #9AA5B4; border-radius: 4px; background: #FFFFFF; display: flex; align-items: center; padding: 0 6px; font-size: 11px; color: #0B2545;">es.example.com/products</span></span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 26px; height: 26px; border-radius: 4px; background: #E3E9F2; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B2545" stroke-width="3" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"></path></svg></span></span><span style="flex: 1;"></span><span style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 11px; font-weight: 900; color: #1466F0;">Style Guide</span><span style="font-size: 11px; font-weight: 900; color: #1466F0;">Glossary</span></span></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;"><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; animation: up .4s 24s both;"><b style="font-size: 13px; color: #0B2545;">Additional content</b><br><span style="font-size: 12px; color: #3B4F6B; line-height: 1.4;">Toggle to send feedback or edit the page title, meta description or OG tags.</span></div><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; animation: up .4s 26.2s both;"><b style="font-size: 13px; color: #0B2545;">URL box</b><br><span style="font-size: 12px; color: #3B4F6B; line-height: 1.4;">Always shows the current page. Paste a URL to jump to it.</span></div><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; animation: up .4s 28.4s both;"><b style="font-size: 13px; color: #0B2545;">Open origin arrow</b><br><span style="font-size: 12px; color: #3B4F6B; line-height: 1.4;">Quick side-by-side check against the origin site.</span></div><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; animation: up .4s 30.6s both;"><b style="font-size: 13px; color: #0B2545;">Style Guide &amp; Glossary</b><br><span style="font-size: 12px; color: #3B4F6B; line-height: 1.4;">How the brand wants things translated, and its key terms.</span></div></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #1466F0;">Around &middot; 2 of 2</div>
+<div class="tt" style="font-size: 26px;">The toolbar</div>
+<div class="bl" style="animation: fromR .6s 24s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">1</span><span class="bt" style="font-size: 18px;">Left: Additional content (title, meta description, OG tags).</span></div>
+<div class="bl" style="animation: fromR .6s 26.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">2</span><span class="bt" style="font-size: 18px;">Middle: the URL box and the open origin arrow.</span></div>
+<div class="bl" style="animation: fromR .6s 30.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">3</span><span class="bt" style="font-size: 18px;">Right: the Style Guide and Glossary.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 2 · EDIT MODE ============ -->
+<template id="scene-2">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 2: Roles and Edit mode</div><div class="h2s">Reviewers send feedback. Editors can also edit.</div></div>
+<div class="sc" style="left: 40px; width: 389.33px; background: #E5F4DE; color: #2F7A22; animation: up .6s 1.4s both, litRing 18s 4s both;"><div class="sr"><span class="sn" style="background: #2F7A22;">1</span><span class="tg" style="background: #2F7A22;">Reviewer / Editor</span></div><div class="st">Two roles</div><svg class="mk" width="28" height="28" style="animation: pop .5s 21.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 445.33px; width: 389.33px; background: #E5F4DE; color: #2F7A22; animation: up .6s 1.6s both, litRing 18s 22s both;"><div class="sr"><span class="sn" style="background: #2F7A22;">2</span><span class="tg" style="background: #2F7A22;">Editor</span></div><div class="st">Edit a segment</div><svg class="mk" width="28" height="28" style="animation: pop .5s 39.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 850.67px; width: 389.33px; background: #E5F4DE; color: #2F7A22; animation: up .6s 1.8s both, litRing 18s 40s both;"><div class="sr"><span class="sn" style="background: #2F7A22;">3</span><span class="tg" style="background: #2F7A22;">Both</span></div><div class="st">Send feedback</div><svg class="mk" width="28" height="28" style="animation: pop .5s 57.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Time to edit.</div>
+<div class="win" style="animation: win 18s 4s both;">
+<div class="shot" style="background: #F3F6FB; display: block;"><div style="position: absolute; left: 30px; top: 30px; width: 300px; height: 230px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 5s both;"><span class="tg" style="background: #1466F0; align-self: flex-start;">Reviewer</span><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Sends feedback</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Suggests a change. MotionPoint makes it.</span></div><div style="position: absolute; left: 370px; top: 30px; width: 300px; height: 230px; border-radius: 16px; background: #E5F4DE; border: 3px solid #2F7A22; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 7.5s both;"><span class="tg" style="background: #2F7A22; align-self: flex-start;">Editor</span><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Feedback and edits</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Can also change the translation directly, live.</span></div><div style="position: absolute; left: 30px; top: 290px; width: 640px; height: 90px; border-radius: 20px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 18px; padding: 0 30px; animation: up .7s 11s both;"><span style="font-size: 17px; font-weight: 900;">Two roles. Only Editors can change the translation themselves.</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #2F7A22;">Edit &middot; 1 of 3</div>
+<div class="tt" style="font-size: 26px;">Two user roles</div>
+<div class="bl" style="animation: fromR .6s 5.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">1</span><span class="bt" style="font-size: 18px;">Reviewer: sends feedback.</span></div>
+<div class="bl" style="animation: fromR .6s 8s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">2</span><span class="bt" style="font-size: 18px;">Editor: sends feedback and makes edits.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 22s both;">
+<div class="shot" style="background: #E5F4DE; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 22.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 22.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF; box-shadow: 0 0 0 3px #F6C453;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Pages Review</span></div><div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0;"><span style="padding: 3px 6px; border-radius: 4px; outline: 1px dashed #9AA5B4; font-size: 15px; color: #0B2545; animation: fadeIn .4s 24s both;">Nuevos tel&eacute;fonos</span><span style="padding: 3px 6px; border-radius: 4px; outline: 2px dashed #1466F0; background: #EAF2FF; font-size: 15px; color: #0B2545; animation: fadeIn .4s 24.5s both;">Env&iacute;o gratis en todos los pedidos</span><span style="padding: 3px 6px; border-radius: 4px; outline: 1px dashed #9AA5B4; font-size: 15px; color: #0B2545; animation: fadeIn .4s 25s both;">Comprar ahora</span></div><div style="border-top: 2px solid #DCE1E8; padding-top: 8px; display: grid; grid-template-columns: 1fr 150px; gap: 10px; animation: up .5s 26s both;"><div style="display: flex; flex-direction: column; gap: 6px;"><div style="display: flex; gap: 12px; font-size: 12px; font-weight: 900;"><span style="color: #1466F0; border-bottom: 2px solid #1466F0;">Edit</span><span style="color: #5A6B84;">Feedback</span></div><span style="font-size: 12px; color: #3B4F6B;">Original: Free shipping on all orders</span><span style="padding: 6px 8px; border: 2px solid #F04438; border-radius: 4px; background: #FFFFFF; font-size: 13px; color: #0B2545; animation: fadeIn .4s 28s both;">Env&iacute;o gratis en todos los pedidos</span><span style="align-self: flex-start; padding: 5px 14px; border-radius: 4px; background: #2F7A22; color: #FFFFFF; font-size: 12px; font-weight: 900; animation: pop .45s 30s both;">Save</span></div><div style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; font-weight: 900; color: #0B2545;"><span style="padding: 6px 8px; background: #F3F6FB; border-radius: 6px;">Translation Memory</span><span style="padding: 6px 8px; background: #F3F6FB; border-radius: 6px;">Validator</span></div></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #2F7A22;">Edit &middot; 2 of 3</div>
+<div class="tt" style="font-size: 26px;">Edit a segment</div>
+<div class="bl" style="animation: fromR .6s 23.5s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">1</span><span class="bt" style="font-size: 18px;">Go to the page, then switch to <b>Edit</b> mode.</span></div>
+<div class="bl" style="animation: fromR .6s 25s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">2</span><span class="bt" style="font-size: 18px;">Highlight and click a segment: the panel opens at the bottom.</span></div>
+<div class="bl" style="animation: fromR .6s 28s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">3</span><span class="bt" style="font-size: 18px;">Editors type in the white box and click Save.</span></div>
+<div class="call" style="background: #B42318; animation: pop .5s 32s both;"><span class="lab" style="color: #FFFFFF; opacity: .8;">Careful</span><span style="font-size: 18px; font-weight: 900; line-height: 1.35;">Live right away, and every identical segment changes too.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 40s both;">
+<div class="shot" style="background: #DCE7F7; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 40.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 40.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Pages Review</span></div><div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0;"><span style="padding: 3px 6px; border-radius: 4px; outline: 2px dashed #1466F0; background: #EAF2FF; font-size: 15px; color: #0B2545; animation: fadeIn .4s 41.5s both;">Env&iacute;o gratis en todos los pedidos</span></div><div style="border-top: 2px solid #DCE1E8; padding-top: 8px; display: flex; flex-direction: column; gap: 8px; animation: up .5s 42s both;"><div style="display: flex; gap: 12px; font-size: 12px; font-weight: 900;"><span style="color: #5A6B84;">Edit</span><span style="color: #1466F0; border-bottom: 2px solid #1466F0;">Feedback</span></div><span style="padding: 8px 10px; border: 1px solid #9AA5B4; border-radius: 4px; font-size: 13px; color: #0B2545; animation: fadeIn .4s 43.5s both;"><b>Comment:</b> Please use &ldquo;pedidos&rdquo; site-wide, not &ldquo;&oacute;rdenes&rdquo;.</span><span style="padding: 8px 10px; border: 1px solid #9AA5B4; border-radius: 4px; font-size: 13px; color: #0B2545; animation: fadeIn .4s 45s both;"><b>Suggested translation:</b> Env&iacute;o gratis en todos los pedidos</span><span style="align-self: flex-start; padding: 6px 16px; border-radius: 4px; background: #1466F0; color: #FFFFFF; font-size: 12px; font-weight: 900; animation: pop .45s 47s both;">Submit</span></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #1466F0;">Edit &middot; 3 of 3</div>
+<div class="tt" style="font-size: 26px;">Or send feedback</div>
+<div class="bl" style="animation: fromR .6s 41.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">1</span><span class="bt" style="font-size: 18px;">Want MotionPoint to make the change? Open the Feedback tab.</span></div>
+<div class="bl" style="animation: fromR .6s 43.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">2</span><span class="bt" style="font-size: 18px;">Type a comment and suggest a translation.</span></div>
+<div class="bl" style="animation: fromR .6s 47s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">3</span><span class="bt" style="font-size: 18px;">Click Submit: the request goes to MotionPoint.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 3 · GLOSSARY ============ -->
+<template id="scene-3">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 3: Style Guide and Glossary Manager</div><div class="h2s">How the brand wants things translated.</div></div>
+<div class="sc" style="left: 40px; width: 389.33px; background: #DDF3F1; color: #0F7C7A; animation: up .6s 1.4s both, litRing 18s 4s both;"><div class="sr"><span class="sn" style="background: #0F7C7A;">1</span><span class="tg" style="background: #0F7C7A;">Reference</span></div><div class="st">Style Guide &amp; Glossary</div><svg class="mk" width="28" height="28" style="animation: pop .5s 21.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 445.33px; width: 389.33px; background: #DDF3F1; color: #0F7C7A; animation: up .6s 1.6s both, litRing 18s 22s both;"><div class="sr"><span class="sn" style="background: #0F7C7A;">2</span><span class="tg" style="background: #0F7C7A;">Glossary</span></div><div class="st">Term feedback</div><svg class="mk" width="28" height="28" style="animation: pop .5s 39.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 850.67px; width: 389.33px; background: #E3E9F2; color: #0B2545; animation: up .6s 1.8s both, litRing 18s 40s both;"><div class="sr"><span class="sn" style="background: #0B2545;">3</span><span class="tg" style="background: #0B2545;">Open &rarr; Closed</span></div><div class="st">Statuses</div><svg class="mk" width="28" height="28" style="animation: pop .5s 57.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Brand voice, and key terms.</div>
+<div class="win" style="animation: win 18s 4s both;">
+<div class="shot" style="background: #DDF3F1; display: block;"><div style="position: absolute; left: 30px; top: 30px; width: 300px; height: 240px; border-radius: 16px; background: #DDF3F1; border: 3px solid #0F7C7A; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 5s both;"><svg width="30" height="30" style="flex-shrink: 0; color: #0F766E;"><use href="#dc-doc"></use></svg><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Style Guide</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Tells our linguists the tone for the target market and how brand-specific items are translated.</span></div><div style="position: absolute; left: 370px; top: 30px; width: 300px; height: 240px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 7.5s both;"><svg width="30" height="30" style="flex-shrink: 0; color: #1466F0;"><use href="#dc-edit"></use></svg><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Glossary Manager</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">The latest glossary. Send feedback on terms at the start of a project, or change terms later.</span></div><div style="position: absolute; left: 30px; top: 296px; width: 640px; height: 86px; border-radius: 20px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 18px; padding: 0 30px; animation: up .7s 11s both;"><span style="font-size: 16px; font-weight: 900; line-height: 1.4;">Both help our linguists translate accurately, in the customer&rsquo;s brand voice.</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0F7C7A;">Glossary &middot; 1 of 3</div>
+<div class="tt" style="font-size: 26px;">Style Guide and Glossary</div>
+<div class="bl" style="animation: fromR .6s 5.5s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">1</span><span class="bt" style="font-size: 18px;">Both open from the upper right of Live Edit.</span></div>
+<div class="bl" style="animation: fromR .6s 7s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">2</span><span class="bt" style="font-size: 18px;">Style Guide: tone and brand items.</span></div>
+<div class="bl" style="animation: fromR .6s 9s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">3</span><span class="bt" style="font-size: 18px;">Glossary Manager: how key terms are translated.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 22s both;">
+<div class="shot" style="background: #DCE7F7; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 22.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; justify-content: space-between; align-items: center;"><b style="font-size: 15px; color: #0B2545;">Glossary Manager</b><span style="font-size: 11px; color: #0B2545; padding: 4px 8px; border: 1px solid #DCE1E8; border-radius: 6px;">Open 1 &middot; Returned 0 &middot; Closed 12</span></div><span style="height: 28px; border: 1px solid #9AA5B4; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 12px; color: #0B2545; animation: fadeIn .4s 23.5s both;">Search: shipping</span><div style="display: grid; grid-template-columns: 220px 1fr; gap: 10px; flex: 1;"><div style="display: flex; flex-direction: column; gap: 4px;"><span style="padding: 6px 8px; border-radius: 6px; font-size: 12.5px; color: #0B2545; background: #F3F6FB; animation: up .4s 24.5s both;">checkout &rarr; pago</span><span style="padding: 6px 8px; border-radius: 6px; font-size: 12.5px; color: #0B2545; background: #EAF2FF; outline: 2px solid #1466F0; animation: up .4s 25s both;">free shipping &rarr; env&iacute;o gratis</span><span style="padding: 6px 8px; border-radius: 6px; font-size: 12.5px; color: #0B2545; background: #F3F6FB; animation: up .4s 25.5s both;">orders &rarr; pedidos</span></div><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; animation: fadeIn .4s 26s both;"><div style="display: flex; gap: 12px; font-size: 12px; font-weight: 900;"><span style="color: #5A6B84;">Details</span><span style="color: #1466F0; border-bottom: 2px solid #1466F0;">Feedback</span><span style="color: #5A6B84;">History</span></div><span style="padding: 8px; border: 1px solid #9AA5B4; border-radius: 4px; font-size: 12.5px; color: #0B2545; animation: fadeIn .4s 28s both;">Please use &ldquo;env&iacute;o sin costo&rdquo; instead.</span><span style="align-self: flex-start; padding: 5px 14px; border-radius: 4px; background: #1466F0; color: #FFFFFF; font-size: 12px; font-weight: 900; animation: pop .45s 30s both;">Send</span></div></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #1466F0;">Glossary &middot; 2 of 3</div>
+<div class="tt" style="font-size: 26px;">Send feedback on a term</div>
+<div class="bl" style="animation: fromR .6s 23.5s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">1</span><span class="bt" style="font-size: 18px;">Search the term in the origin or translated language.</span></div>
+<div class="bl" style="animation: fromR .6s 26s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">2</span><span class="bt" style="font-size: 18px;">Select it, open the Feedback tab, write the request.</span></div>
+<div class="bl" style="animation: fromR .6s 30s both;"><span class="bn" style="background: #DCE7F7; color: #1466F0;">3</span><span class="bt" style="font-size: 18px;">Click Send.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 40s both;">
+<div class="shot" style="background: #F3F6FB; display: block;"><div style="position: absolute; left: 20px; top: 30px; width: 206px; height: 190px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 41s both; align-items: center; text-align: center;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Open</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">MotionPoint is notified and starts the change.</span></div><svg width="16" height="24" style="position: absolute; left: 228px; top: 113px; animation: fadeIn .4s 42s both;"><path d="M2 12 H12 M4 4 L13 12 L4 20" stroke="#94A3B8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><div style="position: absolute; left: 246px; top: 30px; width: 206px; height: 190px; border-radius: 16px; background: #FCE3CC; border: 3px solid #C2410C; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 43.5s both; align-items: center; text-align: center;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Returned</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">MotionPoint needs the customer&rsquo;s input to finish it.</span></div><svg width="16" height="24" style="position: absolute; left: 454px; top: 113px; animation: fadeIn .4s 44.5s both;"><path d="M2 12 H12 M4 4 L13 12 L4 20" stroke="#94A3B8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><div style="position: absolute; left: 472px; top: 30px; width: 206px; height: 190px; border-radius: 16px; background: #E5F4DE; border: 3px solid #2F7A22; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 46s both; align-items: center; text-align: center;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Closed</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Done, usually within 1 to 2 business days.</span></div><div style="position: absolute; left: 20px; top: 240px; width: 660px; display: flex; flex-direction: column; gap: 8px;"><div class="row" style="height: 44px; font-size: 14.5px; animation: up .4s 49s both;"><svg width="20" height="20" style="flex-shrink: 0;"><use href="#dc-check"></use></svg>Feedback tally box (upper right): click a status to filter, e.g. Returned</div><div class="row" style="height: 44px; font-size: 14.5px; animation: up .4s 50.2s both;"><svg width="20" height="20" style="flex-shrink: 0;"><use href="#dc-check"></use></svg>History tab: every change made to the term</div><div class="row" style="height: 44px; font-size: 14.5px; animation: up .4s 51.4s both;"><svg width="20" height="20" style="flex-shrink: 0;"><use href="#dc-check"></use></svg>Download arrow: export the whole glossary to Excel</div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0B2545;">Glossary &middot; 3 of 3</div>
+<div class="tt" style="font-size: 26px;">Feedback statuses</div>
+<div class="bl" style="animation: fromR .6s 41.5s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">1</span><span class="bt" style="font-size: 18px;">Open &rarr; Returned (needs input) &rarr; Closed.</span></div>
+<div class="bl" style="animation: fromR .6s 46s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">2</span><span class="bt" style="font-size: 18px;">Usually closed within 1 to 2 business days.</span></div>
+<div class="bl" style="animation: fromR .6s 49s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">3</span><span class="bt" style="font-size: 18px;">Filter by status, check History, export to Excel.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 4 · DASHBOARD ============ -->
+<template id="scene-4">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 4: The Dashboard</div><div class="h2s">Reports on all feedback and edits.</div></div>
+<div class="sc" style="left: 40px; width: 389.33px; background: #FCE3CC; color: #C2410C; animation: up .6s 1.4s both, litRing 18s 4s both;"><div class="sr"><span class="sn" style="background: #C2410C;">1</span><span class="tg" style="background: #C2410C;">Reports</span></div><div class="st">Tiles &amp; filters</div><svg class="mk" width="28" height="28" style="animation: pop .5s 21.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 445.33px; width: 389.33px; background: #FCE3CC; color: #C2410C; animation: up .6s 1.6s both, litRing 18s 22s both;"><div class="sr"><span class="sn" style="background: #C2410C;">2</span><span class="tg" style="background: #C2410C;">Needs input</span></div><div class="st">Returned items</div><svg class="mk" width="28" height="28" style="animation: pop .5s 39.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 850.67px; width: 389.33px; background: #E5F4DE; color: #2F7A22; animation: up .6s 1.8s both, litRing 18s 40s both;"><div class="sr"><span class="sn" style="background: #2F7A22;">3</span><span class="tg" style="background: #2F7A22;">History</span></div><div class="st">Edits &amp; export</div><svg class="mk" width="28" height="28" style="animation: pop .5s 57.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Where everything is tracked.</div>
+<div class="win" style="animation: win 18s 4s both;">
+<div class="shot" style="background: #FCE3CC; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 4.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 4.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF; box-shadow: 0 0 0 3px #F6C453;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Pages Review</span></div><div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;"><div style="border-radius: 10px; background: #DCE7F7; border: 2px solid #1466F0; padding: 10px; animation: pop .45s 6s both;"><span class="lab">Feedback</span><br><span class="disp" style="font-size: 28px; font-weight: 700; color: #0B2545;">14</span></div><div style="border-radius: 10px; background: #FCE3CC; border: 2px solid #C2410C; padding: 10px; animation: pop .45s 6.8s both;"><span class="lab">Returned</span><br><span class="disp" style="font-size: 28px; font-weight: 700; color: #0B2545;">2</span></div><div style="border-radius: 10px; background: #E5F4DE; border: 2px solid #2F7A22; padding: 10px; animation: pop .45s 7.6s both;"><span class="lab">Edits</span><br><span class="disp" style="font-size: 28px; font-weight: 700; color: #0B2545;">9</span></div></div><span style="height: 28px; border: 1px solid #9AA5B4; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 12px; color: #3B4F6B; animation: fadeIn .4s 9s both;">Filters: Status &middot; Language &middot; Date &middot; User</span><div style="border: 1px solid #DCE1E8; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #0B2545; display: flex; flex-direction: column; gap: 6px; animation: up .5s 11s both;"><b>&#9660; Feedback: &ldquo;Use pedidos site-wide&rdquo; &middot; Returned</b><span style="padding: 6px 8px; border-radius: 6px; background: #F3F6FB;"><b>MotionPoint:</b> Should this also apply to the checkout pages?</span><span style="padding: 6px 8px; border: 1px solid #9AA5B4; border-radius: 6px; animation: fadeIn .4s 14s both;"><b>Reply:</b> Yes, everywhere please. &nbsp;<b style="color: #1466F0;">Send</b></span></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #C2410C;">Dashboard &middot; 1 of 3</div>
+<div class="tt" style="font-size: 26px;">The reporting area</div>
+<div class="bl" style="animation: fromR .6s 6s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">1</span><span class="bt" style="font-size: 18px;">Tiles at the top summarize feedback and edits.</span></div>
+<div class="bl" style="animation: fromR .6s 9s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">2</span><span class="bt" style="font-size: 18px;">Filter, then expand an item for details.</span></div>
+<div class="bl" style="animation: fromR .6s 13s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">3</span><span class="bt" style="font-size: 18px;">Reply right there: a back-and-forth with MotionPoint.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 22s both;">
+<div class="shot" style="background: #FCE3CC; display: block;"><div style="position: absolute; left: 30px; top: 30px; width: 640px; height: 130px; border-radius: 16px; background: #FCE3CC; border: 3px solid #C2410C; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 23s both;"><svg width="30" height="30" style="flex-shrink: 0; color: #C2410C;"><use href="#dc-mail"></use></svg><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Returned = we need their input</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">The customer gets an email for every Returned item, and we wait for their clarification.</span></div><div style="position: absolute; left: 30px; top: 180px; width: 640px; height: 110px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 27s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Workflow approval</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">MotionPoint offers an approval workflow, if the customer wants one.</span></div><div style="position: absolute; left: 30px; top: 306px; width: 640px; height: 76px; border-radius: 20px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 18px; padding: 0 30px; animation: up .7s 30s both;"><span style="font-size: 16px; font-weight: 900;">A Returned item stays open until the customer replies.</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #C2410C;">Dashboard &middot; 2 of 3</div>
+<div class="tt" style="font-size: 26px;">Returned items</div>
+<div class="bl" style="animation: fromR .6s 23.5s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">1</span><span class="bt" style="font-size: 18px;">Returned means MotionPoint needs more input.</span></div>
+<div class="bl" style="animation: fromR .6s 25.5s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">2</span><span class="bt" style="font-size: 18px;">The customer gets an email for each one.</span></div>
+<div class="bl" style="animation: fromR .6s 27.5s both;"><span class="bn" style="background: #FCE3CC; color: #C2410C;">3</span><span class="bt" style="font-size: 18px;">An approval workflow is available on request.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 18s 40s both;">
+<div class="shot" style="background: #E5F4DE; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 40.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 40.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Pages Review</span></div><b style="font-size: 14px; color: #0B2545;">Edits</b><div style="display: grid; grid-template-columns: 1fr 1fr 110px; font-size: 12px; color: #0B2545; border: 1px solid #DCE1E8; border-radius: 6px; overflow: hidden;"><b style="padding: 6px 8px; background: #F3F6FB;">Edited from</b><b style="padding: 6px 8px; background: #F3F6FB;">Edited to</b><b style="padding: 6px 8px; background: #F3F6FB;">By</b><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8; animation: fadeIn .4s 42s both;">Env&iacute;o gratis en todas las &oacute;rdenes</span><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8; animation: fadeIn .4s 42.4s both;">Env&iacute;o gratis en todos los pedidos</span><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8;">Editor A</span><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8; animation: fadeIn .4s 43s both;">Comprar ya</span><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8; animation: fadeIn .4s 43.4s both;">Comprar ahora</span><span style="padding: 6px 8px; border-top: 1px solid #DCE1E8;">Editor B</span></div><span style="align-self: flex-end; padding: 6px 14px; border-radius: 4px; background: #1D6F42; color: #FFFFFF; font-size: 12px; font-weight: 900; animation: pop .45s 46s both;">Export to Excel</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #2F7A22;">Dashboard &middot; 3 of 3</div>
+<div class="tt" style="font-size: 26px;">The Edits tile</div>
+<div class="bl" style="animation: fromR .6s 41.5s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">1</span><span class="bt" style="font-size: 18px;">Every edit the customer&rsquo;s team made.</span></div>
+<div class="bl" style="animation: fromR .6s 43s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">2</span><span class="bt" style="font-size: 18px;">What it was edited from, and to.</span></div>
+<div class="bl" style="animation: fromR .6s 46s both;"><span class="bn" style="background: #E5F4DE; color: #2F7A22;">3</span><span class="bt" style="font-size: 18px;">Anything shown can be exported to Excel.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 5 · PAGES REVIEW ============ -->
+<template id="scene-5">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 5: Pages Review</div><div class="h2s">A set of pages to review together.</div></div>
+<div class="sc" style="left: 40px; width: 592px; background: #DDF3F1; color: #0F7C7A; animation: up .6s 1.4s both, litRing 17s 4s both;"><div class="sr"><span class="sn" style="background: #0F7C7A;">1</span><span class="tg" style="background: #0F7C7A;">Review</span></div><div class="st">What it&rsquo;s for</div><svg class="mk" width="28" height="28" style="animation: pop .5s 20.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 648px; width: 592px; background: #DDF3F1; color: #0F7C7A; animation: up .6s 1.6s both, litRing 17s 21s both;"><div class="sr"><span class="sn" style="background: #0F7C7A;">2</span><span class="tg" style="background: #0F7C7A;">Actions</span></div><div class="st">Add pages</div><svg class="mk" width="28" height="28" style="animation: pop .5s 37.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Reviewing a set of pages.</div>
+<div class="win" style="animation: win 17s 4s both;">
+<div class="shot" style="background: #DDF3F1; display: block;"><div style="position: absolute; left: 30px; top: 30px; width: 300px; height: 220px; border-radius: 16px; background: #DDF3F1; border: 3px solid #0F7C7A; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 5s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Sample pages</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">At the start of a project, to review and approve sample pages.</span></div><div style="position: absolute; left: 370px; top: 30px; width: 300px; height: 220px; border-radius: 16px; background: #DCE7F7; border: 3px solid #1466F0; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 6px; animation: pop .55s 7.5s both;"><span class="disp" style="font-size: 19px; font-weight: 700; color: #0B2545; line-height: 1.25;">Internal review lists</span><span style="font-size: 15px; font-weight: 700; color: #3B4F6B; line-height: 1.35;">Customers can build their own list of pages to review.</span></div><div style="position: absolute; left: 30px; top: 280px; width: 640px; height: 100px; border-radius: 20px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 18px; padding: 0 30px; animation: up .7s 11s both;"><span style="font-size: 16px; font-weight: 900; line-height: 1.4;">Pages Review captures all feedback and edits made on those pages.</span></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0F7C7A;">Review &middot; 1 of 2</div>
+<div class="tt" style="font-size: 26px;">What it&rsquo;s for</div>
+<div class="bl" style="animation: fromR .6s 5.5s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">1</span><span class="bt" style="font-size: 18px;">Review a set of pages, and capture feedback and edits.</span></div>
+<div class="bl" style="animation: fromR .6s 7.5s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">2</span><span class="bt" style="font-size: 18px;">Usually sample pages at the start of a project.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 17s 21s both;">
+<div class="shot" style="background: #DDF3F1; display: block;"><div class="wc" style="left: 20px; top: 10px; width: 660px; height: 380px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; animation: zoomIn .6s 21.5s both;"><span style="font-size: 11px; font-weight: 900; color: #1466F0; letter-spacing: .1em;">LIVE EDIT</span><div style="display: flex; gap: 6px; align-items: center; animation: fadeIn .4s 21.8s both;"><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Navigate</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Edit</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; color: #3B4F6B;">Dashboard</span><span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 900; background: #1466F0; color: #FFFFFF; box-shadow: 0 0 0 3px #F6C453;">Pages Review</span></div><div style="display: flex; gap: 10px; align-items: center;"><span style="padding: 6px 12px; border: 2px solid #F04438; border-radius: 6px; font-size: 12px; font-weight: 900; color: #0B2545; animation: pop .45s 23s both;">Actions &#9660;</span><span style="font-size: 12px; color: #0B2545; animation: fadeIn .4s 24s both;">&rarr; Add to page reviews</span></div><span class="mono" style="padding: 8px; border: 1px solid #9AA5B4; border-radius: 4px; font-size: 12px; color: #0B2545; animation: fadeIn .4s 25s both;">es.example.com/<br>es.example.com/products</span><div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #F3F6FB; border-radius: 8px; animation: up .5s 29s both;"><span style="font-size: 12px; color: #0B2545;">Or, from any page:</span><span style="padding: 5px 12px; border-radius: 4px; background: #0F766E; color: #FFFFFF; font-size: 12px; font-weight: 900; box-shadow: 0 0 0 3px #F04438;">Add to page reviews</span></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0F7C7A;">Review &middot; 2 of 2</div>
+<div class="tt" style="font-size: 26px;">Add pages</div>
+<div class="bl" style="animation: fromR .6s 23s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">1</span><span class="bt" style="font-size: 18px;">Actions &rsaquo; Add to page reviews, then paste the URLs.</span></div>
+<div class="bl" style="animation: fromR .6s 29s both;"><span class="bn" style="background: #DDF3F1; color: #0F7C7A;">2</span><span class="bt" style="font-size: 18px;">Or use the Add to page reviews button, top right of any page.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 6 · HELPING CUSTOMERS ============ -->
+<template id="scene-6">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 6: Helping customers with Live Edit</div><div class="h2s">Questions you&rsquo;ll hear, and the answers.</div></div>
+<div class="sc" style="left: 40px; width: 592px; background: #E3E9F2; color: #0B2545; animation: up .6s 1.4s both, litRing 19s 4s both;"><div class="sr"><span class="sn" style="background: #0B2545;">1</span><span class="tg" style="background: #0B2545;">Q &amp; A</span></div><div class="st">Common questions</div><svg class="mk" width="28" height="28" style="animation: pop .5s 22.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="sc" style="left: 648px; width: 592px; background: #E3E9F2; color: #0B2545; animation: up .6s 1.6s both, litRing 19s 23s both;"><div class="sr"><span class="sn" style="background: #0B2545;">2</span><span class="tg" style="background: #0B2545;">Q &amp; A</span></div><div class="st">More questions</div><svg class="mk" width="28" height="28" style="animation: pop .5s 41.4s both;"><use href="#dc-check"></use></svg></div>
+<div class="panel" style="animation: up .7s 2.2s both;">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #8A99AD; animation: fadeOut .5s 3.8s forwards;">Customers will ask you about it.</div>
+<div class="win" style="animation: win 19s 4s both;">
+<div class="shot" style="background: #E3E9F2; display: block;"><div style="position: absolute; left: 20px; top: 14px; width: 660px; display: flex; flex-direction: column; gap: 8px;"><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 5s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;How do I get access?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; They ask their CXM to become a Live Edit user.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 7.8s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;Why can&rsquo;t I edit, only send feedback?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; They have the Reviewer role. Editors can edit.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 10.6s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;I changed one word and it changed everywhere.&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; Saving an edit changes all identical segments.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 13.4s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;Why did I get an email about a Returned item?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; MotionPoint needs their input. They reply in the Dashboard.</span></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0B2545;">Support &middot; 1 of 2</div>
+<div class="tt" style="font-size: 26px;">Common questions</div>
+<div class="bl" style="animation: fromR .6s 5.5s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">1</span><span class="bt" style="font-size: 18px;">Access: through their CXM.</span></div>
+<div class="bl" style="animation: fromR .6s 8s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">2</span><span class="bt" style="font-size: 18px;">Can&rsquo;t edit: Reviewer role.</span></div>
+<div class="bl" style="animation: fromR .6s 11s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">3</span><span class="bt" style="font-size: 18px;">Changed everywhere: identical segments.</span></div>
+<div class="bl" style="animation: fromR .6s 14s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">4</span><span class="bt" style="font-size: 18px;">Returned email: reply in the Dashboard.</span></div>
+</div>
+</div>
+<div class="win" style="animation: win 19s 23s both;">
+<div class="shot" style="background: #E3E9F2; display: block;"><div style="position: absolute; left: 20px; top: 14px; width: 660px; display: flex; flex-direction: column; gap: 8px;"><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 24s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;How long does glossary feedback take?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; Usually 1 to 2 business days, once it&rsquo;s clear.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 26.8s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;Can I fix the page title or meta description?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; Yes: toggle Additional content.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 29.6s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;I need a report of our edits.&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; Dashboard &rsaquo; Edits tile &rsaquo; Export to Excel.</span></div><div style="border-radius: 10px; background: #FFFFFF; padding: 8px 12px; animation: up .45s 32.4s both;"><b style="font-size: 14px; color: #0B2545;">&ldquo;Can we review sample pages first?&rdquo;</b><br><span style="font-size: 13.5px; color: #2F7A22; font-weight: 700;">&rarr; Yes: Pages Review.</span></div></div></div>
+<div class="tc2">
+<div class="eb" style="color: #0B2545;">Support &middot; 2 of 2</div>
+<div class="tt" style="font-size: 26px;">More questions</div>
+<div class="bl" style="animation: fromR .6s 24.5s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">1</span><span class="bt" style="font-size: 18px;">Glossary feedback: usually 1 to 2 business days.</span></div>
+<div class="bl" style="animation: fromR .6s 27s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">2</span><span class="bt" style="font-size: 18px;">Titles and metas: Additional content.</span></div>
+<div class="bl" style="animation: fromR .6s 30s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">3</span><span class="bt" style="font-size: 18px;">Reports: export to Excel.</span></div>
+<div class="bl" style="animation: fromR .6s 33s both;"><span class="bn" style="background: #E3E9F2; color: #0B2545;">4</span><span class="bt" style="font-size: 18px;">Sample pages: Pages Review.</span></div>
+</div>
+</div>
+</div>
+</div>
+</template>
+
+<!-- ============ SCENE 7 · PRACTICE ============ -->
+<template id="scene-7">
+<div style="position: absolute; left: 0; top: 72px; width: 1280px; height: 648px;">
+<div class="sh" style="animation: up .6s .2s both;"><div class="h2">Part 7: Practice. What would you do?</div><div class="h2s">Think of your answer before it appears.</div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 4s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 1</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">A customer can send feedback but can&rsquo;t edit anything.</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #DCE7F7; border: 3px solid #1466F0; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 9s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">They have the Reviewer role. Only Editors can make edits; their CXM can help with roles.</span></div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 14s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 2</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">An Editor saved a change. When does it show on the site?</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #FFF1F0; border: 3px solid #B42318; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 19s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">Right away, and every identical segment changes too.</span></div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 24s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 3</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">A customer wants MotionPoint to make the change.</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #E5F4DE; border: 3px solid #2F7A22; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 29s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">Use the Feedback tab: comment, suggested translation, Submit.</span></div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 34s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 4</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">A glossary feedback item shows Returned.</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #FCE3CC; border: 3px solid #C2410C; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 39s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">MotionPoint needs their input. They got an email; they reply in the Dashboard.</span></div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 44s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 5</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">The customer wants to fix a page&rsquo;s meta description.</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #DDF3F1; border: 3px solid #0F7C7A; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 49s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">Toggle Additional content: title, meta description and OG tags.</span></div></div>
+<div style="position: absolute; left: 160px; top: 80px; width: 960px; height: 520px; animation: win 10s 54s both;"><div class="wc" style="left: 0; top: 0; width: 960px; height: 190px; padding: 26px 32px; display: flex; flex-direction: column; gap: 12px;"><span class="lab">Case 6</span><span class="disp" style="font-size: 26px; font-weight: 600; color: #0B2545; line-height: 1.35;">Leadership wants a list of all edits made.</span></div><div style="position: absolute; left: 0; top: 220px; width: 960px; min-height: 120px; border-radius: 18px; background: #E3E9F2; border: 3px solid #0B2545; padding: 22px 28px; display: flex; align-items: center; gap: 18px; animation: pop .5s 59s both;"><svg width="40" height="40" style="flex-shrink: 0;"><use href="#dc-check"></use></svg><span style="font-size: 23px; font-weight: 900; color: #0B2545; line-height: 1.4;">Dashboard &rsaquo; Edits tile: edited from and to, exported to Excel.</span></div></div>
+<div style="position: absolute; left: 40px; top: 66px; width: 1200px; height: 566px; border-radius: 22px; background: #DCE7F7; padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; animation: pop .6s 66s both;"><span class="disp" style="font-size: 26px; font-weight: 700; color: #0B2545; margin-bottom: 4px;">Recap: Live Edit</span><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 67.5s both;"><span class="sn" style="background: #1466F0;">1</span><span><b>Where:</b> ControlCenter &rsaquo; Live Edit; four areas: Navigate, Edit, Dashboard, Pages Review</span></div><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 69.7s both;"><span class="sn" style="background: #1466F0;">2</span><span><b>Roles:</b> Reviewer sends feedback; Editor sends feedback and edits</span></div><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 71.9s both;"><span class="sn" style="background: #1466F0;">3</span><span><b>Edits</b> go live right away and change every identical segment</span></div><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 74.1s both;"><span class="sn" style="background: #1466F0;">4</span><span><b>Glossary:</b> term feedback, Open &rarr; Returned &rarr; Closed (usually 1&ndash;2 business days)</span></div><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 76.3s both;"><span class="sn" style="background: #1466F0;">5</span><span><b>Dashboard:</b> tiles, filters, replies, Returned emails, Edits, export to Excel</span></div><div class="row" style="height: 64px; font-size: 17px; font-weight: 700; animation: up .5s 78.5s both;"><span class="sn" style="background: #1466F0;">6</span><span><b>Pages Review:</b> sample pages and internal review lists</span></div><div style="margin-top: auto; padding: 14px 20px; border-radius: 14px; background: #7C2D12; color: #FFFFFF; font-size: 20px; font-weight: 900; animation: pop .5s 82s both;">Know the tool, so you can guide the customer. Thanks for watching!</div></div>
+</div>
+</template>
+
+<div id="sceneHost" style="position: absolute; inset: 0;"></div>
+
+<!-- ============ COVER ============ -->
+<div id="cover">
+<div style="position: absolute; inset: 0; background: #0B2545; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; color: #FFFFFF;">
+<div style="font-size: 16px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: #8FD16F;">MotionPoint Support &middot; New Agent Training</div>
+<h1 class="disp" style="margin: 0; font-size: 64px; line-height: 1.05; font-weight: 700;">Live Edit</h1>
+<p style="margin: 0; font-size: 22px; color: #C9D6E8; max-width: 800px;">What the customer&rsquo;s Live Edit tool does, who can use it, and how, so you can support them. About 7 minutes, with background music.</p>
+<button type="button" id="coverPlay" style="margin-top: 14px; height: 72px; padding: 0 40px; border-radius: 36px; border: none; background: #1466F0; color: #FFFFFF; font-family: 'Lexend', sans-serif; font-size: 26px; font-weight: 600; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 40px rgba(20,102,240,.45);">
+<svg width="26" height="26" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#FFFFFF"></path></svg>Play</button>
+</div>
+</div>
+
+</div>
+
+<!-- ===================== SUBTITLES ===================== -->
+<div style="height: 70px; flex-shrink: 0; background: #0B1626; display: flex; align-items: center; justify-content: center; padding: 0 48px; position: relative; overflow: hidden;">
+<div id="subs" style="display: contents;"></div>
+</div>
+
+<!-- ===================== CONTROLS ===================== -->
+<div style="height: 80px; flex-shrink: 0; background: #0E1B2E; display: flex; flex-direction: column;">
+<div style="height: 6px; background: #1D2E48;"><div id="prog" style="height: 6px; width: 0%; background: #5DB645;"></div></div>
+<div style="flex-grow: 1; display: flex; align-items: center; gap: 10px; padding: 0 20px;">
+<button type="button" class="ctl main" id="playBtn" aria-label="Play">
+<span id="icoPause" style="display: contents;" hidden><svg width="18" height="18" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1" fill="#FFFFFF"></rect><rect x="14" y="4.5" width="4" height="15" rx="1" fill="#FFFFFF"></rect></svg></span>
+<span id="icoPlay" style="display: contents;"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#FFFFFF"></path></svg></span>
+<span id="playLabel">Play</span>
+</button>
+<button type="button" class="ctl" id="replayBtn" aria-label="Replay from start">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6EEF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
+</button>
+<button type="button" class="ctl" id="back10Btn" aria-label="Back 10 seconds" title="Back 10 seconds (Left arrow)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6EEF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-5-5 5-5"></path><path d="M18 17l-5-5 5-5"></path></svg>
+<span>10s</span>
+</button>
+<button type="button" class="ctl" id="fwd10Btn" aria-label="Forward 10 seconds" title="Forward 10 seconds (Right arrow)">
+<span>10s</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6EEF8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 17l5-5-5-5"></path><path d="M6 17l5-5-5-5"></path></svg>
+</button>
+<button type="button" class="ctl" id="musicBtn" aria-label="Music on" aria-pressed="true">
+<span id="icoMusicOn" style="display: contents;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8FD16F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="17" cy="16" r="3"></circle></svg></span>
+<span id="icoMusicOff" style="display: contents;" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A9B8CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="17" cy="16" r="3"></circle><path d="M3 3l18 18"></path></svg></span>
+<span id="musicLabel" style="display:none">Music on</span>
+</button>
+<button type="button" class="ctl" id="subsBtn" aria-label="Hide captions" aria-pressed="true">
+<svg width="22" height="18" viewBox="0 0 26 20" fill="none" id="subsIcon" stroke="#8FD16F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="23" height="17" rx="3"></rect><path d="M11 8.2a3 3 0 1 0 0 3.6"></path><path d="M19 8.2a3 3 0 1 0 0 3.6"></path></svg>
+</button>
+<button type="button" class="ctl" id="prevBtn" aria-label="Previous scene">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6EEF8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+</button>
+<button type="button" class="ctl" id="nextBtn" aria-label="Next scene">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6EEF8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+<div style="width: 1px; height: 30px; background: #2A3E5C; margin: 0 4px;"></div>
+<div style="display: flex; gap: 4px; flex-grow: 1; overflow: hidden;">
+<span id="chapters" style="display: contents;"></span>
+</div>
+<div style="font-size: 14px; font-weight: 700; color: #A9B8CC; white-space: nowrap; font-variant-numeric: tabular-nums;" id="timeLabel">0:00</div>
+</div>
+</div>
+
+
+</div>
+</div>
+<script>
+const STEP_HTML = "<div style=\"height: 52px; padding: 0 18px 0 6px; border-radius: 26px; background: #0B2545; color: #FFFFFF; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 16px rgba(11,37,69,.22); animation: pop 0.78s ease both;\">\n<span class=\"disp\" style=\"width: 40px; height: 40px; border-radius: 20px; background: #5DB645; color: #0B2545; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700;\">{{st.n}}</span>\n<span style=\"font-size: 15px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase;\">Part {{st.n}} of 7</span>\n</div>";
+const SUB_OPEN = "<div style=\"position: absolute; left: 48px; right: 48px; top: 0; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 22px; line-height: 1.3; font-weight: 700; color: #F4F7FB; animation: up 0.7s ease both;\">";
+function fit(){ const s = Math.min(window.innerWidth / 1280, window.innerHeight / 870); document.getElementById('fit').style.transform = 'scale(' + s + ')'; }
+window.addEventListener('resize', fit); fit();
+class Player {
+  constructor() {
+    this.state = { scene: 0, el: 0, playing: false, started: false, ended: false, music: true, subsOn: true };
+    this.ctx = null;
+  }
+  durs() { return [26000, 42000, 60000, 60000, 60000, 40000, 44000, 90000]; }
+  subLines() {
+    return [[[0, "Welcome! This video covers Live Edit."], [5000, "Live Edit is a browser-based tool in ControlCenter. Customers use it to send feedback to MotionPoint, or to edit translations on their live translated site."], [9000, "Customers use it every day, so you need to know what it does to answer their questions."], [13000, "There are two roles: Reviewers send feedback. Editors send feedback and make edits."], [19000, "Keep this in mind: a saved edit goes live right away, and changes every identical segment."]],
+      [[0, "Part 1: getting around Live Edit."], [4000, "Live Edit is in ControlCenter, at control dot motionpoint dot com. It runs in a browser like Chrome or Firefox."], [7000, "There are four main areas at the top: Navigate your site, Edit content segments, view reports on the Dashboard, and set up pages for review."], [12000, "Customers who need a login can ask their CXM."], [22000, "On the left, the Additional content toggle lets users send feedback or edit the page title, meta description, or OG tags."], [26000, "In the middle, the URL box always shows the current page. Paste a URL to jump to it."], [28500, "The open origin arrow gives a quick comparison between the origin and the translated site."], [32500, "And at the upper right, the Style Guide and Glossary are there for reference."]],
+      [[0, "Part 2: roles and Edit mode."], [4000, "There are two user roles. A Reviewer can send feedback."], [8000, "An Editor can send feedback, and make edits too."], [22000, "Go to the page you want, then switch to Edit mode."], [25000, "Highlight a segment and click it. The panel opens at the bottom of the screen."], [28000, "An Editor clicks in the white box, makes the change, and clicks Save."], [32000, "It's live on the translated site right away, and all identical segments change too."], [35000, "The tabs on the right show Translation Memory, to check how terms were translated before, and the Validator."], [40000, "Want MotionPoint to make the change instead? Use the Feedback tab."], [43500, "Type a comment, suggest a translation, and click Submit. The request goes to MotionPoint."]],
+      [[0, "Part 3: the Style Guide and Glossary Manager."], [4000, "Both open from the upper right of Live Edit."], [5500, "The Style Guide tells our linguists the tone for the target market, and how brand-specific items should be translated."], [8000, "The Glossary Manager has the latest glossary. Customers can send feedback on terms at the start of a project, or change existing terms later."], [22000, "Search for a term in the origin or translated language, and select it."], [26000, "Open the Feedback tab, write the request, and click Send."], [40000, "The status is now Open. MotionPoint is notified and starts the change."], [43500, "If MotionPoint has questions, the item goes to Returned. That means we need the customer's input."], [46500, "Once we hear back, we implement it and close it, usually within one to two business days."], [49000, "The feedback tally box filters by status, the History tab shows every change to a term, and the download arrow exports the glossary to Excel."]],
+      [[0, "Part 4: the Dashboard."], [4000, "Feedback and edits show up here. The tiles at the top summarize them."], [9000, "Use the filters to focus, and expand an item for details."], [13000, "Customers can reply right there. It's a back-and-forth conversation with MotionPoint."], [22000, "Items that need more input from the customer are placed in Returned status."], [25000, "The customer gets an email for each Returned item, and we wait for their clarification."], [27000, "MotionPoint also offers an approval workflow, if the customer wants one."], [40000, "The Edits tile shows every edit the customer's team made: what it was edited from, and what it was edited to."], [46000, "Anything shown in the Dashboard can be exported to Excel."]],
+      [[0, "Part 5: Pages Review."], [4000, "Pages Review lets a team review a set of pages, and captures any feedback and edits made on them."], [7500, "It's usually used at the start of a project to approve sample pages. Customers can also create their own lists for internal review."], [21000, "Use the Actions drop-down, click Add to page reviews, and paste the URLs."], [29000, "Or, from any page, click the Add to page reviews button at the top right."]],
+      [[0, "Part 6: helping customers with Live Edit."], [4000, "How do I get access? They ask their CXM to become a Live Edit user."], [7000, "Why can I only send feedback? They have the Reviewer role. Editors can edit."], [10000, "I changed one word and it changed everywhere. Saving an edit changes all identical segments."], [13000, "Why did I get an email about a Returned item? MotionPoint needs their input. They reply in the Dashboard."], [23000, "How long does glossary feedback take? Usually one to two business days."], [26000, "Can I fix the page title or meta description? Yes: toggle Additional content."], [29000, "I need a report of our edits. Dashboard, Edits tile, export to Excel."], [32000, "Can we review sample pages first? Yes: Pages Review."]],
+      [[0, "Part 7: practice. What would you do?"], [4000, "A customer can send feedback, but can't edit anything."], [9000, "They have the Reviewer role. Only Editors can make edits. Their CXM can help with roles."], [14000, "An Editor saved a change. When does it show on the site?"], [19000, "Right away. And every identical segment changes too."], [24000, "A customer wants MotionPoint to make the change."], [29000, "Use the Feedback tab: add a comment and a suggested translation, then Submit."], [34000, "A glossary feedback item shows Returned."], [39000, "MotionPoint needs their input. They got an email, and they reply in the Dashboard."], [44000, "The customer wants to fix a page's meta description."], [49000, "Toggle Additional content: the title, meta description and OG tags."], [54000, "Leadership wants a list of all edits made."], [59000, "Dashboard, Edits tile: edited from and to, exported to Excel."], [66000, "Quick recap."], [82000, "Know the tool, so you can guide the customer. Thanks for watching!"]]];
+  }
+  labels() { return ["Intro", "Around", "Edit", "Glossary", "Dashboard", "Review", "Support", "Practice"]; }
+
+  /* ---------- original background jazz, synthesized live ---------- */
+  bars() {
+    // [bass walk (MIDI), chord voicing (MIDI)] — ii-V-I in F with turnarounds, 80 bpm swing
+    return [
+      [[43, 46, 50, 47], [58, 62, 65, 69]], // Gm9
+      [[48, 46, 43, 40], [58, 62, 64, 69]], // C13
+      [[41, 45, 48, 49], [57, 60, 64, 67]], // Fmaj9
+      [[50, 48, 45, 44], [54, 60, 64, 69]], // D9
+      [[43, 46, 50, 47], [58, 62, 65, 69]], // Gm9
+      [[48, 46, 43, 40], [58, 62, 64, 69]], // C13
+      [[45, 48, 52, 51], [60, 64, 67, 71]], // Am9
+      [[50, 48, 45, 44], [54, 60, 64, 69]]  // D9
+    ];
+  }
+  hz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  initAudio() {
+    if (this.ctx) return true;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      const ctx = new AC();
+      const master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+      const len = Math.floor(ctx.sampleRate * 1.0);
+      const noise = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = noise.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      this.ctx = ctx; this.master = master; this.noise = noise;
+      this.beat = 0; this.nextT = 0;
+      return true;
+    } catch (e) { return false; }
+  }
+  pianoNote(m, t, vel, dur) {
+    const c = this.ctx;
+    const f = this.hz(m);
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(2600, t); lp.frequency.exponentialRampToValueAtTime(900, t + dur);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vel, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(vel * 0.3, t + 0.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    lp.connect(g); g.connect(this.master);
+    [[1, 1], [2, 0.28], [3, 0.08]].forEach((h) => {
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f * h[0];
+      const hg = c.createGain(); hg.gain.value = h[1];
+      o.connect(hg); hg.connect(lp);
+      o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  pianoChord(notes, t, vel, dur) {
+    notes.forEach((m, i) => this.pianoNote(m, t + i * 0.018, vel, dur));
+  }
+  tap(t, vol, dur, freq) {
+    const c = this.ctx;
+    const s = c.createBufferSource(); s.buffer = this.noise;
+    const f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = freq;
+    const g = c.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(this.master);
+    s.start(t); s.stop(t + dur + 0.02);
+  }
+  scheduleBeat(i, t) {
+    const spb = 60 / 80;
+    const sw = spb * 2 / 3;
+    const barIx = Math.floor(i / 4) % 8;
+    const bar = this.bars()[barIx];
+    const b = i % 4;
+    this.tap(t, 0.014, 0.25, 7500);
+    if (b === 1 || b === 3) {
+      this.tap(t + sw, 0.01, 0.18, 7500);
+      this.tap(t, 0.012, 0.05, 9500);
+    }
+    if (b === 0) {
+      this.pianoNote(bar[0][0] + 12, t, 0.05, 2.4);
+      this.pianoChord(bar[1], t + 0.03, 0.028, 2.2);
+    }
+    const v = Math.floor(i / 4) % 2;
+    if (b === 2 && v === 0) this.pianoChord(bar[1], t + sw, 0.018, 1.2);
+    if (b === 1 && v === 1) this.pianoChord(bar[1], t + sw, 0.018, 1.2);
+  }
+  schedule() {
+    const c = this.ctx;
+    if (!c || c.state !== 'running' || !this.musicLive) return;
+    if (this.nextT < c.currentTime) this.nextT = c.currentTime + 0.05;
+    while (this.nextT < c.currentTime + 0.3) {
+      this.scheduleBeat(this.beat, this.nextT);
+      this.beat = (this.beat + 1) % 32;
+      this.nextT += 60 / 80;
+    }
+  }
+  musicStart() {
+    if (!this.state.music || !this.initAudio()) return;
+    const c = this.ctx;
+    try { c.resume(); } catch (e) {}
+    if (!this.musicLive) {
+      this.musicLive = true;
+      this.beat = 0;
+      this.nextT = c.currentTime + 0.1;
+      this.master.gain.cancelScheduledValues(c.currentTime);
+      this.master.gain.setValueAtTime(0.0001, c.currentTime);
+      this.master.gain.exponentialRampToValueAtTime(0.55, c.currentTime + 1.5);
+    }
+  }
+  musicStop(fade) {
+    if (!this.ctx) return;
+    const c = this.ctx;
+    this.musicLive = false;
+    const now = c.currentTime;
+    this.master.gain.cancelScheduledValues(now);
+    this.master.gain.setValueAtTime(Math.max(this.master.gain.value, 0.0001), now);
+    this.master.gain.exponentialRampToValueAtTime(0.0001, now + (fade || 0.3));
+  }
+  musicPause() { if (this.ctx) { try { this.ctx.suspend(); } catch (e) {} } }
+  musicResume() { if (this.ctx && this.state.music) { try { this.ctx.resume(); } catch (e) {} } }
+
+  componentDidMount() {
+    this.iv = setInterval(() => this.tick(), 200);
+    this.au = setInterval(() => this.schedule(), 60);
+  }
+  componentWillUnmount() {
+    clearInterval(this.iv); clearInterval(this.au); clearTimeout(this.to);
+    if (this.ctx) { try { this.ctx.close(); } catch (e) {} }
+  }
+  tick() {
+    const s = this.state;
+    if (!s.playing || s.scene < 0) return;
+    const d = this.durs();
+    const el = s.el + 200;
+    if (el >= d[s.scene]) {
+      if (s.scene < d.length - 1) this.setState({ scene: s.scene + 1, el: 0 });
+      else { this.setState({ el: d[s.scene], playing: false, ended: true }); this.musicStop(3); }
+    } else {
+      this.setState({ el: el });
+    }
+  }
+  go(i, off) {
+    off = off || 0;
+    clearTimeout(this.to);
+    this.musicStart();
+    this.musicResume();
+    this.setState({ scene: -1, el: 0 });
+    this.to = setTimeout(() => {
+      this.setState({ scene: i, el: off, started: true, playing: true, ended: false });
+      if (off) setTimeout(() => this.sync(off), 60);
+    }, 40);
+  }
+  sync(off) {
+    try {
+      const st = document.querySelector('.stage');
+      if (!st || !st.getAnimations) return;
+      st.getAnimations({ subtree: true }).forEach((a) => { try { a.currentTime = off; } catch (e) {} });
+    } catch (e) {}
+  }
+  jump(delta) {
+    const d = this.durs();
+    const s = this.state;
+    const cur = s.scene < 0 ? 0 : s.scene;
+    let t = 0;
+    for (let i = 0; i < cur; i++) t += d[i];
+    t += (s.scene < 0 || !s.started) ? 0 : s.el;
+    const total = d.reduce((a, b) => a + b, 0);
+    t = Math.max(0, Math.min(t + delta, total - 500));
+    let i = 0;
+    while (i < d.length - 1 && t >= d[i]) { t -= d[i]; i++; }
+    this.go(i, t);
+  }
+  fmt(ms) {
+    const t = Math.floor(ms / 1000);
+    const m = Math.floor(t / 60);
+    const sec = t % 60;
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+  renderVals() {
+    const s = this.state;
+    const d = this.durs();
+    const total = d.reduce((a, b) => a + b, 0);
+    const cur = s.scene < 0 ? 0 : s.scene;
+    let done = 0;
+    for (let i = 0; i < cur; i++) done += d[i];
+    done += s.scene < 0 ? 0 : s.el;
+    const vis = s.started ? s.scene : -2;
+    const chapters = this.labels().map((label, i) => ({
+      label: label,
+      cls: s.started && i === cur ? 'on' : (s.started && i < cur ? 'done' : ''),
+      go: () => this.go(i)
+    }));
+    return {
+      s0: vis === 0, s1: vis === 1, s2: vis === 2, s3: vis === 3, s4: vis === 4, s5: vis === 5, s6: vis === 6, s7: vis === 7,
+      showCover: !s.started,
+      pauseCls: s.playing ? '' : 'paused',
+      isPlaying: s.playing,
+      notPlaying: !s.playing,
+      playLabel: s.playing ? 'Pause' : (s.ended ? 'Replay' : 'Play'),
+      progressW: (Math.min(1, done / total) * 100).toFixed(2) + '%',
+      timeLabel: this.fmt(done) + ' / ' + this.fmt(total),
+      chapters: chapters,
+      steps: [1, 2, 3, 4, 5, 6, 7].map((n) => ({ n: n, on: s.started && s.scene >= 0 && s.scene === n })),
+      showSubs: s.subsOn && s.started,
+      subs: (() => {
+        const L = s.scene >= 0 ? this.subLines()[s.scene] : [];
+        let act = -1;
+        L.forEach((c, i) => { if (s.el >= c[0]) act = i; });
+        return L.map((c, i) => ({ text: c[1], on: i === act }));
+      })(),
+      subsOn: s.subsOn,
+      subsLabel: s.subsOn ? 'Hide captions' : 'Show captions',
+      subsColor: s.subsOn ? '#8FD16F' : '#A9B8CC',
+      toggleSubs: () => this.setState({ subsOn: !this.state.subsOn }),
+      musicOn: s.music,
+      musicOff: !s.music,
+      musicLabel: s.music ? 'Music on' : 'Music off',
+      toggleMusic: () => {
+        const on = !this.state.music;
+        this.setState({ music: on }, () => {
+          if (!on) this.musicStop(0.6);
+          else if (this.state.playing) this.musicStart();
+        });
+      },
+      togglePlay: () => {
+        if (!this.state.started || this.state.ended) this.go(0);
+        else {
+          const playing = !this.state.playing;
+          if (playing) this.musicResume(); else this.musicPause();
+          this.setState({ playing: playing });
+        }
+      },
+      replay: () => this.go(0),
+      back10: () => this.jump(-10000),
+      fwd10: () => this.jump(10000),
+      prev: () => this.go(Math.max(0, cur - 1)),
+      next: () => this.go(Math.min(d.length - 1, cur + 1))
+    };
+  }
+}
+
+Player.prototype.setState = function (obj, cb) { Object.assign(this.state, obj); this.render(); if (cb) cb(); };
+Player.prototype.render = function () {
+  const v = this.renderVals();
+  const $ = (id) => document.getElementById(id);
+  const s = this.state;
+  const vis = s.started ? s.scene : -2;
+  if (vis !== this._vis) {
+    this._vis = vis;
+    const tpl = $('scene-' + vis);
+    $('sceneHost').innerHTML = tpl ? tpl.innerHTML : '';
+  }
+  $('stage').classList.toggle('paused', !s.playing);
+  $('cover').hidden = !v.showCover;
+  const st = v.steps.find((x) => x.on);
+  const stn = st ? st.n : 0;
+  if (stn !== this._step) { this._step = stn; $('steps').innerHTML = stn ? STEP_HTML.split('{{st.n}}').join(String(stn)) : ''; }
+  const sb = v.showSubs ? v.subs.find((x) => x.on) : null;
+  const key = sb ? s.scene + '|' + sb.text : '';
+  if (key !== this._sub) {
+    this._sub = key;
+    $('subs').innerHTML = '';
+    if (sb) { const d = document.createElement('div'); d.innerHTML = SUB_OPEN + '</div>'; d.firstChild.textContent = sb.text; $('subs').appendChild(d.firstChild); }
+  }
+  $('prog').style.width = v.progressW;
+  $('timeLabel').textContent = v.timeLabel;
+  $('playLabel').textContent = v.playLabel;
+  $('playBtn').setAttribute('aria-label', v.playLabel);
+  $('icoPause').hidden = !v.isPlaying; $('icoPlay').hidden = v.isPlaying;
+  $('musicLabel').textContent = v.musicLabel; $('musicBtn').setAttribute('aria-label', v.musicLabel); $('musicBtn').setAttribute('aria-pressed', String(v.musicOn));
+  $('icoMusicOn').hidden = !v.musicOn; $('icoMusicOff').hidden = v.musicOn;
+  $('subsBtn').setAttribute('aria-label', v.subsLabel); $('subsBtn').setAttribute('aria-pressed', String(v.subsOn)); $('subsIcon').setAttribute('stroke', v.subsColor);
+  const ck = v.chapters.map((c) => c.cls).join(',');
+  if (ck !== this._chips) {
+    this._chips = ck;
+    const host = $('chapters'); host.innerHTML = '';
+    v.chapters.forEach((c, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip ' + c.cls; b.textContent = c.label;
+      b.addEventListener('click', () => this.go(i)); host.appendChild(b);
+    });
+  }
+};
+const P = new Player();
+const call = (k) => () => P.renderVals()[k]();
+document.getElementById('coverPlay').addEventListener('click', call('togglePlay'));
+document.getElementById('playBtn').addEventListener('click', call('togglePlay'));
+document.getElementById('replayBtn').addEventListener('click', call('replay'));
+document.getElementById('prevBtn').addEventListener('click', call('prev'));
+document.getElementById('back10Btn').addEventListener('click', call('back10'));
+document.getElementById('fwd10Btn').addEventListener('click', call('fwd10'));
+document.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') { e.preventDefault(); call('back10')(); } else if (e.key === 'ArrowRight') { e.preventDefault(); call('fwd10')(); } else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); call('togglePlay')(); } });
+document.getElementById('nextBtn').addEventListener('click', call('next'));
+document.getElementById('musicBtn').addEventListener('click', call('toggleMusic'));
+document.getElementById('subsBtn').addEventListener('click', call('toggleSubs'));
+P.render();
+P.componentDidMount();
+
+</script>
+</body>
+</html>
